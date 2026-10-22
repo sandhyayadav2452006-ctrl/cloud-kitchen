@@ -1,0 +1,4 @@
+package com.tastenest.servlet;
+import jakarta.servlet.*; import jakarta.servlet.annotation.WebServlet;import jakarta.servlet.http.*;import java.io.*;import java.sql.*;import com.tastenest.util.DB;
+@WebServlet("/admin")
+public class AdminServlet extends HttpServlet{protected void doGet(HttpServletRequest q,HttpServletResponse r)throws IOException{r.setContentType("application/json");try{DB.init();try(Connection c=DB.get();Statement s=c.createStatement()){ResultSet a=s.executeQuery("SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURDATE()");a.next();int orders=a.getInt(1);ResultSet b=s.executeQuery("SELECT COALESCE(SUM(total_amount),0) FROM orders WHERE DATE(created_at)=CURDATE()");b.next();double rev=b.getDouble(1);r.getWriter().print("{\"orders\":"+orders+",\"revenue\":"+rev+",\"expenses\":1520,\"profit\":"+(rev-1520)+"}");}}catch(Exception e){r.setStatus(500);r.getWriter().print("{\"orders\":0,\"revenue\":0,\"expenses\":1520,\"profit\":-1520}");}}}
